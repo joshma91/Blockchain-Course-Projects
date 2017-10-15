@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.15;
 
 /**
  * Project work: Bidding contract
@@ -50,6 +50,13 @@ contract BiddingContract {
     // Initalize createdAt to current time
     createdAt = now;
     owner = msg.sender;
+    ended = false;
+
+    //set highBidder as the address who initialized contract instance
+    highBidder.bidder = owner;
+    highBidder.name = nm;
+    highBidder.bidAmount = sBid;
+    highBidder.claimedEthers = true; //doesn't get ethers back
   }
 
   // Bid function is what gets called by any bidder
@@ -67,7 +74,6 @@ contract BiddingContract {
       BidFailed(msg.sender, name, bid);
       revert();
     } else {
-
       //since the current bid is greater, we put the old highBidder into the losers array
       if(highBidder.bidAmount != 0){
         /*losersMapping[highBidder.bidder].bidder = highBidder.bidder;
@@ -127,6 +133,10 @@ contract BiddingContract {
     revert();
   }
 
+  function minutesLeft() returns (uint){
+    return (now - createdAt + duration);
+    //return (now*1 hours - (createdAt + duration)*1 hours);
+  }
   // Can a bid end if there are unclaimed ethers
   // In later version the claims data will be moved to a separate contract
   // Claims will be made losers against the separate contract
